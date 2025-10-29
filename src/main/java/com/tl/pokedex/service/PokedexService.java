@@ -97,8 +97,6 @@ public class PokedexService {
     }
 
     private String getTranslatedDescriptionOrOriginalDescription(TranslateClientResponse translateClientResponse, String originalDescription){
-        if(translateClientResponse == null) return originalDescription;
-
         Contents contents = translateClientResponse.getContents();
 
         if(contents == null) return originalDescription;
