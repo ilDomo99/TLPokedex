@@ -15,6 +15,7 @@ import com.tl.pokedex.dto.service.request.GetTranslatedPokemonInformationService
 import com.tl.pokedex.dto.service.response.GetPokemonInfoServiceResponse;
 import com.tl.pokedex.dto.service.response.GetTranslatedPokemonInformationServiceResponse;
 import com.tl.pokedex.mapper.PokemonInformationMapper;
+import com.tl.pokedex.util.ValidationUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -26,14 +27,18 @@ public class PokedexService {
     private final PokeApiClient pokeApiClient;
     private final PokemonInformationMapper pokemonInformationMapper;
     private final FunTranslationClient funTranslationClient;
+    private final ValidationUtil validationUtil;
 
-    public PokedexService(PokeApiClient pokeApiClient, PokemonInformationMapper pokemonInformationMapper, FunTranslationClient funTranslationClient) {
+    public PokedexService(PokeApiClient pokeApiClient, PokemonInformationMapper pokemonInformationMapper, FunTranslationClient funTranslationClient, ValidationUtil validationUtil) {
         this.pokeApiClient = pokeApiClient;
         this.pokemonInformationMapper = pokemonInformationMapper;
         this.funTranslationClient = funTranslationClient;
+        this.validationUtil = validationUtil;
     }
 
     public GetPokemonInfoServiceResponse getPokemonInfo(GetPokemonInfoServiceRequest request){
+        validationUtil.isValidOrFail(GetPokemonInfoServiceRequest.class, request);
+
         String pokemonName = request.getPokemonName();
 
         PokemonSpeciesClientRequest pokemonSpeciesClientRequest = new PokemonSpeciesClientRequest();
@@ -41,6 +46,8 @@ public class PokedexService {
 
         PokemonSpeciesClientResponse pokemonSpeciesClientResponse = pokeApiClient.getPokemonSpecies(pokemonSpeciesClientRequest);
         PokemonSpecies pokemonSpecies = pokemonSpeciesClientResponse.getPokemonSpecies();
+
+        validationUtil.isValidOrFail(PokemonSpecies.class, pokemonSpecies);
 
         PokemonInformation pokemonInformation = pokemonInformationMapper.pokemonInformationFromPokemonSpecies(pokemonSpecies);
 
@@ -52,6 +59,7 @@ public class PokedexService {
 
     public GetTranslatedPokemonInformationServiceResponse getTranslatedPokemonInformation(GetTranslatedPokemonInformationServiceRequest request){
         PokemonInformation pokemonInformation = request.getPokemonInformation();
+        validationUtil.isValidOrFail(PokemonInformation.class, pokemonInformation);
 
         String originalDescription = pokemonInformation.getDescription();
 
