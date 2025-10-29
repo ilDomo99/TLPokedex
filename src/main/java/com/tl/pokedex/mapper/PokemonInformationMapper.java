@@ -5,6 +5,7 @@ import com.tl.pokedex.dto.api.pokeapi.FlavorText;
 import com.tl.pokedex.dto.api.pokeapi.NamedApiResource;
 import com.tl.pokedex.dto.api.pokeapi.PokemonSpecies;
 import com.tl.pokedex.dto.model.PokemonInformation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -35,11 +36,11 @@ public class PokemonInformationMapper {
                 .map(FlavorText::getFlavorText)
                 .findFirst();
 
-        String description = descriptionFromFlavorText.orElse("");
+        String description = descriptionFromFlavorText.orElse(StringUtils.EMPTY);
 
         String habitat = pokemonSpecies.getHabitat() != null ?
                 pokemonSpecies.getHabitat().getName() :
-                "";
+                StringUtils.EMPTY;
 
         Boolean isLegendary = pokemonSpecies.getIsLegendary();
 

@@ -1,6 +1,8 @@
 package com.tl.pokedex.constant;
 
 public class ErrorConstant {
+    private ErrorConstant(){}
+
     public static final String GENERIC_EXCEPTION_LOG = "An unexpected error occurred: ";
     public static final String GENERIC_EXCEPTION_MESSAGE = "Oops, something went wrong";
 
