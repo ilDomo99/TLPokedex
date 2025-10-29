@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TranslateRequest {
+public class TranslateClientRequest {
     private String text;
 }

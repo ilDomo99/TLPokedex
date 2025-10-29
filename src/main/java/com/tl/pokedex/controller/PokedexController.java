@@ -1,10 +1,17 @@
 package com.tl.pokedex.controller;
 
-import com.tl.pokedex.constant.ApiConstant;
+import com.tl.pokedex.constant.AppConstant;
+import com.tl.pokedex.dto.controller.response.GetPokemonInfoFromNameControllerResponse;
+import com.tl.pokedex.dto.controller.response.GetTranslatedPokemonInfoFromNameControllerResponse;
 import com.tl.pokedex.dto.model.PokemonInformation;
+import com.tl.pokedex.dto.service.request.GetPokemonInfoServiceRequest;
+import com.tl.pokedex.dto.service.request.GetTranslatedPokemonInformationServiceRequest;
+import com.tl.pokedex.dto.service.response.GetPokemonInfoServiceResponse;
+import com.tl.pokedex.dto.service.response.GetTranslatedPokemonInformationServiceResponse;
 import com.tl.pokedex.service.PokedexService;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ApiConstant.BASE_ENDPOINT)
+@RequestMapping(AppConstant.BASE_ENDPOINT)
 @Validated
 public class PokedexController {
 
@@ -23,27 +30,49 @@ public class PokedexController {
         this.pokedexService = pokedexService;
     }
 
-    @GetMapping(ApiConstant.GET_POKEMON_INFORMATION_ENDPOINT)
-    public ResponseEntity<PokemonInformation> getPokemonInfoFromName(
-            @PathVariable("name")
+    @GetMapping(AppConstant.GET_POKEMON_INFORMATION_ENDPOINT)
+    public ResponseEntity<GetPokemonInfoFromNameControllerResponse> getPokemonInfoFromName(
+            @PathVariable(AppConstant.POKEMON_NAME_PATH_VARIABLE)
             @NotEmpty
             @Size(max = 30)
-            String name){
+            String pokemonName) {
 
-        PokemonInformation pokemonInformation = pokedexService.getPokemonInfoFromName(name);
+        GetPokemonInfoServiceRequest request = new GetPokemonInfoServiceRequest();
+        request.setPokemonName(pokemonName);
 
-        return ResponseEntity.ok(pokemonInformation);
+        GetPokemonInfoServiceResponse serviceResponse = pokedexService.getPokemonInfo(request);
+        PokemonInformation pokemonInformation = serviceResponse.getPokemonInformation();
+
+        GetPokemonInfoFromNameControllerResponse response = new GetPokemonInfoFromNameControllerResponse();
+        BeanUtils.copyProperties(pokemonInformation, response);
+
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping(ApiConstant.GET_TRANSLATED_POKEMON_INFORMATION_ENDPOINT)
-    public ResponseEntity<PokemonInformation> getTranslatedPokemonInfoFromName(
-            @PathVariable("name")
+    @GetMapping(AppConstant.GET_TRANSLATED_POKEMON_INFORMATION_ENDPOINT)
+    public ResponseEntity<GetTranslatedPokemonInfoFromNameControllerResponse> getTranslatedPokemonInfoFromName(
+            @PathVariable(AppConstant.POKEMON_NAME_PATH_VARIABLE)
             @NotEmpty
             @Size(max = 30)
-            String name){
+            String pokemonName) {
 
-        PokemonInformation pokemonInformation = pokedexService.getTranslatedPokemonInformation(name);
+        //PokeInformation
+        GetPokemonInfoServiceRequest getPokemonInfoServiceRequest = new GetPokemonInfoServiceRequest();
+        getPokemonInfoServiceRequest.setPokemonName(pokemonName);
 
-        return ResponseEntity.ok(pokemonInformation);
+        GetPokemonInfoServiceResponse getPokemonInfoServiceResponse = pokedexService.getPokemonInfo(getPokemonInfoServiceRequest);
+        PokemonInformation pokemonInformation = getPokemonInfoServiceResponse.getPokemonInformation();
+
+        //Translate
+        GetTranslatedPokemonInformationServiceRequest getTranslatedPokemonInformationServiceRequest = new GetTranslatedPokemonInformationServiceRequest();
+        getTranslatedPokemonInformationServiceRequest.setPokemonInformation(pokemonInformation);
+
+        GetTranslatedPokemonInformationServiceResponse getTranslatedPokemonInformationServiceResponse = pokedexService.getTranslatedPokemonInformation(getTranslatedPokemonInformationServiceRequest);
+        PokemonInformation translatedPokemonInformation = getTranslatedPokemonInformationServiceResponse.getPokemonInformation();
+
+        GetTranslatedPokemonInfoFromNameControllerResponse response = new GetTranslatedPokemonInfoFromNameControllerResponse();
+        BeanUtils.copyProperties(translatedPokemonInformation, response);
+
+        return ResponseEntity.ok(response);
     }
 }

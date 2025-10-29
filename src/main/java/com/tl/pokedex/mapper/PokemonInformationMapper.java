@@ -1,6 +1,6 @@
 package com.tl.pokedex.mapper;
 
-import com.tl.pokedex.constant.LanguageCostant;
+import com.tl.pokedex.constant.PokeApiConstant;
 import com.tl.pokedex.dto.api.pokeapi.FlavorText;
 import com.tl.pokedex.dto.api.pokeapi.NamedApiResource;
 import com.tl.pokedex.dto.api.pokeapi.PokemonSpecies;
@@ -13,7 +13,7 @@ import java.util.Optional;
 @Component
 public class PokemonInformationMapper {
 
-    public PokemonInformation pokemonInformationFromPokemonSpeciesMapper(PokemonSpecies pokemonSpecies) {
+    public PokemonInformation pokemonInformationFromPokemonSpecies(PokemonSpecies pokemonSpecies) {
         String name = pokemonSpecies.getName();
 
         List<FlavorText> flavorTextEntries = pokemonSpecies.getFlavorTextEntries();
@@ -25,16 +25,16 @@ public class PokemonInformationMapper {
                     NamedApiResource language = flavorText.getLanguage();
 
                     if(language == null) return false;
-                    return LanguageCostant.ENGLISH_LANGUAGE.equalsIgnoreCase(language.getName());
+                    return PokeApiConstant.ENGLISH_LANGUAGE.equalsIgnoreCase(language.getName());
                 })
                 .map(FlavorText::getFlavorText)
                 .findFirst();
 
-        String description = descriptionFromFlavorText.orElse("English descriptionFromFlavorText not available");
+        String description = descriptionFromFlavorText.orElse("");
 
         String habitat = pokemonSpecies.getHabitat() != null ?
                 pokemonSpecies.getHabitat().getName() :
-                "Habitat not available";
+                "";
 
         Boolean isLegendary = pokemonSpecies.getIsLegendary();
 

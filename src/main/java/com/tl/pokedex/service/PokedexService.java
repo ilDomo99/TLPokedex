@@ -2,16 +2,25 @@ package com.tl.pokedex.service;
 
 import com.tl.pokedex.client.FunTranslationClient;
 import com.tl.pokedex.client.PokeApiClient;
-import com.tl.pokedex.constant.HabitatConstant;
+import com.tl.pokedex.constant.PokeApiConstant;
+import com.tl.pokedex.dto.api.funtranslation.Contents;
+import com.tl.pokedex.dto.api.funtranslation.request.TranslateClientRequest;
+import com.tl.pokedex.dto.api.funtranslation.response.TranslateClientResponse;
 import com.tl.pokedex.dto.api.pokeapi.PokemonSpecies;
+import com.tl.pokedex.dto.api.pokeapi.request.PokemonSpeciesClientRequest;
+import com.tl.pokedex.dto.api.pokeapi.response.PokemonSpeciesClientResponse;
 import com.tl.pokedex.dto.model.PokemonInformation;
+import com.tl.pokedex.dto.service.request.GetPokemonInfoServiceRequest;
+import com.tl.pokedex.dto.service.request.GetTranslatedPokemonInformationServiceRequest;
+import com.tl.pokedex.dto.service.response.GetPokemonInfoServiceResponse;
+import com.tl.pokedex.dto.service.response.GetTranslatedPokemonInformationServiceResponse;
 import com.tl.pokedex.mapper.PokemonInformationMapper;
-import jakarta.validation.constraints.NotBlank;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
+
+import java.util.Optional;
 
 @Service
-@Validated
 public class PokedexService {
 
     private final PokeApiClient pokeApiClient;
@@ -24,36 +33,70 @@ public class PokedexService {
         this.funTranslationClient = funTranslationClient;
     }
 
-    public PokemonInformation getPokemonInfoFromName(@NotBlank String name){
-        PokemonSpecies pokemonSpecies = pokeApiClient.getPokemonSpeciesFromName(name);
+    public GetPokemonInfoServiceResponse getPokemonInfo(GetPokemonInfoServiceRequest request){
+        String pokemonName = request.getPokemonName();
 
-        //TODO handle error properly
-        if(pokemonSpecies == null){
-            throw new RuntimeException();
-        }
+        PokemonSpeciesClientRequest pokemonSpeciesClientRequest = new PokemonSpeciesClientRequest();
+        pokemonSpeciesClientRequest.setPokemonName(pokemonName);
 
-        return pokemonInformationMapper.pokemonInformationFromPokemonSpeciesMapper(pokemonSpecies);
+        PokemonSpeciesClientResponse pokemonSpeciesClientResponse = pokeApiClient.getPokemonSpecies(pokemonSpeciesClientRequest);
+        PokemonSpecies pokemonSpecies = pokemonSpeciesClientResponse.getPokemonSpecies();
+
+        PokemonInformation pokemonInformation = pokemonInformationMapper.pokemonInformationFromPokemonSpecies(pokemonSpecies);
+
+        GetPokemonInfoServiceResponse response = new GetPokemonInfoServiceResponse();
+        response.setPokemonInformation(pokemonInformation);
+
+        return response;
     }
 
-    public PokemonInformation getTranslatedPokemonInformation(@NotBlank String name){
-        PokemonInformation pokemonInformation = getPokemonInfoFromName(name);
+    public GetTranslatedPokemonInformationServiceResponse getTranslatedPokemonInformation(GetTranslatedPokemonInformationServiceRequest request){
+        PokemonInformation pokemonInformation = request.getPokemonInformation();
 
-        Boolean isLegendary = pokemonInformation.getIsLegendary();
+        String originalDescription = pokemonInformation.getDescription();
 
-        boolean isHabitatCave =
-                pokemonInformation.getHabitat() != null &&
-                HabitatConstant.CAVE_HABITAT.equalsIgnoreCase(pokemonInformation.getHabitat());
+        boolean isDescriptionNotValid = StringUtils.isBlank(originalDescription);
+
+        if(isDescriptionNotValid){
+            GetTranslatedPokemonInformationServiceResponse response = new GetTranslatedPokemonInformationServiceResponse();
+            response.setPokemonInformation(pokemonInformation);
+
+            return response;
+        }
+
+        boolean isLegendary = Boolean.TRUE.equals(pokemonInformation.getIsLegendary());
+        boolean isHabitatCave = PokeApiConstant.CAVE_HABITAT.equalsIgnoreCase(pokemonInformation.getHabitat());
 
         boolean useYodaTranslation = isLegendary || isHabitatCave;
 
-        String description = pokemonInformation.getDescription();
+        TranslateClientRequest translateClientRequest = new TranslateClientRequest();
+        translateClientRequest.setText(originalDescription);
 
-        String translatedDescription = useYodaTranslation ?
-                funTranslationClient.getYodaTranslation(description) :
-                funTranslationClient.getShakespeareTranslation(description);
+        Optional<TranslateClientResponse> translateResponse = useYodaTranslation ?
+                funTranslationClient.getYodaTranslation(translateClientRequest) :
+                funTranslationClient.getShakespeareTranslation(translateClientRequest);
 
-        pokemonInformation.setDescription(translatedDescription);
+        String description = translateResponse.isPresent() ?
+                getTranslatedDescriptionOrOriginalDescription(translateResponse.get(), originalDescription) :
+                originalDescription;
 
-        return pokemonInformation;
+        pokemonInformation.setDescription(description);
+
+        GetTranslatedPokemonInformationServiceResponse response = new GetTranslatedPokemonInformationServiceResponse();
+        response.setPokemonInformation(pokemonInformation);
+
+        return response;
+    }
+
+    private String getTranslatedDescriptionOrOriginalDescription(TranslateClientResponse translateClientResponse, String originalDescription){
+        if(translateClientResponse == null) return originalDescription;
+
+        Contents contents = translateClientResponse.getContents();
+
+        if(contents == null) return originalDescription;
+
+        String translated = contents.getTranslated();
+
+        return translated != null ? translated : originalDescription;
     }
 }

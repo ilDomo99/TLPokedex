@@ -1,17 +1,17 @@
 package com.tl.pokedex.client;
 
 import com.tl.pokedex.constant.FunTranslationApiConstant;
-import com.tl.pokedex.dto.api.funtranslation.Contents;
-import com.tl.pokedex.dto.api.funtranslation.request.TranslateRequest;
-import com.tl.pokedex.dto.api.funtranslation.response.TranslateResponse;
-import jakarta.validation.constraints.NotBlank;
+import com.tl.pokedex.dto.api.funtranslation.request.TranslateClientRequest;
+import com.tl.pokedex.dto.api.funtranslation.response.TranslateClientResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Optional;
+
 @Service
-@Validated
+@Slf4j
 public class FunTranslationClient {
 
     private final RestTemplate restTemplate;
@@ -20,34 +20,26 @@ public class FunTranslationClient {
         this.restTemplate = restTemplate;
     }
 
-    public String getYodaTranslation(@NotBlank String textToTranslate){
-        return getFunTranslation(FunTranslationApiConstant.YODA_TRANSLATION_ENDPOINT, textToTranslate);
+    public Optional<TranslateClientResponse> getYodaTranslation(TranslateClientRequest request){
+        return getFunTranslation(FunTranslationApiConstant.YODA_TRANSLATION_ENDPOINT, request);
     }
 
-    public String getShakespeareTranslation(@NotBlank String textToTranslate){
-        return getFunTranslation(FunTranslationApiConstant.SHAKESPEARE_TRANSLATION_ENDPOINT, textToTranslate);
+    public Optional<TranslateClientResponse> getShakespeareTranslation(TranslateClientRequest request){
+        return getFunTranslation(FunTranslationApiConstant.SHAKESPEARE_TRANSLATION_ENDPOINT, request);
     }
 
-    private String getFunTranslation(@NotBlank String translationTypeUrl, @NotBlank String textToTranslate){
-        TranslateRequest request = new TranslateRequest();
-        request.setText(textToTranslate);
-
-        TranslateResponse response;
+    private Optional<TranslateClientResponse> getFunTranslation(String translationTypeUrl, TranslateClientRequest request){
+        TranslateClientResponse response;
 
         try {
-            response = restTemplate.postForObject(translationTypeUrl, request, TranslateResponse.class);
+            response = restTemplate.postForObject(translationTypeUrl, request, TranslateClientResponse.class);
         } catch (RestClientException exception){
-            return textToTranslate;
+            log.error("Error: ", exception);
+            return Optional.empty();
         }
 
-        if(response == null) return textToTranslate;
+        if(response == null) return Optional.empty();
 
-        Contents contents = response.getContents();
-
-        if(contents == null) return textToTranslate;
-
-        String translated = contents.getTranslated();
-
-        return translated != null ? translated : textToTranslate;
+        return Optional.of(response);
     }
 }

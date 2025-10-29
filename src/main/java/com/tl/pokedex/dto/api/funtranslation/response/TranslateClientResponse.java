@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TranslateResponse {
+public class TranslateClientResponse {
     private Success success;
     private Contents contents;
 }
