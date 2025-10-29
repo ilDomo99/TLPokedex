@@ -1,44 +1,169 @@
 package controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tl.pokedex.constant.AppConstant;
+import com.tl.pokedex.dto.controller.response.GetPokemonInfoFromNameControllerResponse;
+import com.tl.pokedex.dto.controller.response.GetTranslatedPokemonInfoFromNameControllerResponse;
+import com.tl.pokedex.dto.model.PokemonInformation;
+import config.TestConfig;
+import constant.PokemonNameConstant;
+import jakarta.validation.Validator;
+import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest
+@SpringBootTest(classes = TestConfig.class)
+@AutoConfigureMockMvc
 public class PokedexControllerTest {
 
     protected MockMvc mockMvc;
-    private final WebApplicationContext wac;
 
-    public PokedexControllerTest(WebApplicationContext wac) {
-        this.wac = wac;
-    }
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private WebApplicationContext wac;
+
+    @Autowired
+    private Validator validator;
 
     @BeforeEach
     public void initialization() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
-    /*
     @Test
-    public void givenName_whenGetPokemonInfoFromName_thenReturnPokemonInformation(){
+    @SneakyThrows
+    public void givenPokemonName_whenGetPokemonInfoFromName_thenReturnGetPokemonInfoFromNameControllerResponse() {
 
         String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_POKEMON_INFORMATION_ENDPOINT;
 
-        String name = "mewtwo";
-
-        MvcResult mvcResult = mockMvc.perform(
-                        MockMvcRequestBuilders.get(URI)
-                                .param("name", "TestName")
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstant.LEGENDARY_POKEMON_NAME))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 
-        SendWithholdingFromWorkflowResource res = mapper.readValue(mvcResult.getResponse().getContentAsString(), SendWithholdingFromWorkflowResource.class);
-        Assertions.assertNotNull(res);
+        String jsonResponse = mvcResult.getResponse().getContentAsString();
 
+        Assertions.assertDoesNotThrow(() -> objectMapper.readValue(jsonResponse, GetPokemonInfoFromNameControllerResponse.class));
     }
 
-     */
+    @Test
+    @SneakyThrows
+    public void givenStringWithMoreThen30Characters_whenGetPokemonInfoFromName_thenReturnBadRequest() {
+
+        String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_POKEMON_INFORMATION_ENDPOINT;
+
+        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstant.STRING_WITH_MORE_THEN_30_CHARS))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+    }
+
+    @Test
+    @SneakyThrows
+    public void givenEmptyString_whenGetPokemonInfoFromName_thenReturnNotFound() {
+
+        String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_POKEMON_INFORMATION_ENDPOINT;
+
+        mockMvc.perform(MockMvcRequestBuilders.get(URI, StringUtils.EMPTY))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andReturn();
+    }
+
+    @Test
+    @SneakyThrows
+    public void givenNotExistingPokemonName_whenGetPokemonInfoFromName_thenReturnInternalServerError() {
+
+        String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_POKEMON_INFORMATION_ENDPOINT;
+
+        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstant.NON_POKEMON_NAME))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andReturn();
+    }
+
+    @Test
+    @SneakyThrows
+    public void givenLegendaryPokemonName_whenGetTranslatedPokemonInfoFromName_thenReturnDescriptionWithYodaTranslation() {
+
+        String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_TRANSLATED_POKEMON_INFORMATION_ENDPOINT;
+
+        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstant.LEGENDARY_POKEMON_NAME))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    @SneakyThrows
+    public void givenNormalPokemonName_whenGetTranslatedPokemonInfoFromName_thenReturnDescriptionWithShakespeareTranslation() {
+
+        String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_TRANSLATED_POKEMON_INFORMATION_ENDPOINT;
+
+        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstant.NORMAL_POKEMON_NAME))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    @SneakyThrows
+    public void givenStringWithMoreThen30Characters_whenGetTranslatedPokemonInfoFromName_thenReturnBadRequest() {
+
+        String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_TRANSLATED_POKEMON_INFORMATION_ENDPOINT;
+
+        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstant.STRING_WITH_MORE_THEN_30_CHARS))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+    }
+
+    @Test
+    @SneakyThrows
+    public void givenEmptyString_whenGetTranslatedPokemonInfoFromName_thenReturnNotFound() {
+
+        String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_TRANSLATED_POKEMON_INFORMATION_ENDPOINT;
+
+        mockMvc.perform(MockMvcRequestBuilders.get(URI, StringUtils.EMPTY))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andReturn();
+    }
+
+    @Test
+    @SneakyThrows
+    public void givenNotExistingPokemonName_whenGetTranslatedPokemonInfoFromName_thenReturnInternalServerError() {
+
+        String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_TRANSLATED_POKEMON_INFORMATION_ENDPOINT;
+
+        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstant.NON_POKEMON_NAME))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andReturn();
+    }
+
+    @Test
+    void givenPokemonInformation_whenCopyProperties_thenGetPokemonInfoFromNameControllerResponseHasAllFieldsCopied() {
+        PokemonInformation source = new PokemonInformation(PokemonNameConstant.LEGENDARY_POKEMON_NAME, "test", "test", true);
+        GetPokemonInfoFromNameControllerResponse target = new GetPokemonInfoFromNameControllerResponse();
+
+        BeanUtils.copyProperties(source, target);
+
+        org.assertj.core.api.Assertions.assertThat(target).usingRecursiveComparison().isEqualTo(source);
+    }
+
+    @Test
+    void givenPokemonInformation_whenCopyProperties_thenGetTranslatedPokemonInfoFromNameControllerResponseHasAllFieldsCopied() {
+        PokemonInformation source = new PokemonInformation(PokemonNameConstant.LEGENDARY_POKEMON_NAME, "test", "test", true);
+        GetTranslatedPokemonInfoFromNameControllerResponse target = new GetTranslatedPokemonInfoFromNameControllerResponse();
+
+        BeanUtils.copyProperties(source, target);
+
+        org.assertj.core.api.Assertions.assertThat(target).usingRecursiveComparison().isEqualTo(source);
+    }
 }
