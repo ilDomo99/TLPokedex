@@ -28,9 +28,13 @@ public class PokemonInformationMapper {
         Optional<String> descriptionFromFlavorText = flavorTextEntries.stream()
                 .filter(flavorText -> {
                     if(flavorText == null) return false;
-                    NamedApiResource language = flavorText.getLanguage();
 
+                    String description = flavorText.getFlavorText();
+                    if(description == null) return false;
+
+                    NamedApiResource language = flavorText.getLanguage();
                     if(language == null) return false;
+
                     return PokeApiConstant.ENGLISH_LANGUAGE.equalsIgnoreCase(language.getName());
                 })
                 .map(FlavorText::getFlavorText)
