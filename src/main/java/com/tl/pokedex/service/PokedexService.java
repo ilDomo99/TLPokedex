@@ -45,10 +45,10 @@ public class PokedexService {
         pokemonSpeciesClientRequest.setPokemonName(pokemonName);
 
         PokemonSpeciesClientResponse pokemonSpeciesClientResponse = pokeApiClient.getPokemonSpecies(pokemonSpeciesClientRequest);
+
+        validationUtil.isValidOrFail(PokemonSpeciesClientResponse.class, pokemonSpeciesClientResponse);
+
         PokemonSpecies pokemonSpecies = pokemonSpeciesClientResponse.getPokemonSpecies();
-
-        validationUtil.isValidOrFail(PokemonSpecies.class, pokemonSpecies);
-
         PokemonInformation pokemonInformation = pokemonInformationMapper.pokemonInformationFromPokemonSpecies(pokemonSpecies);
 
         GetPokemonInfoServiceResponse response = new GetPokemonInfoServiceResponse();
