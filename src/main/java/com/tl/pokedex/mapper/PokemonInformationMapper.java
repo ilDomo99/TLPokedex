@@ -7,6 +7,7 @@ import com.tl.pokedex.dto.api.pokeapi.PokemonSpecies;
 import com.tl.pokedex.dto.model.PokemonInformation;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,10 @@ public class PokemonInformationMapper {
         String name = pokemonSpecies.getName();
 
         List<FlavorText> flavorTextEntries = pokemonSpecies.getFlavorTextEntries();
+
+        if(flavorTextEntries == null){
+            flavorTextEntries = new ArrayList<>();
+        }
 
         //Retrieve the english description from PokeAPI
         Optional<String> descriptionFromFlavorText = flavorTextEntries.stream()
