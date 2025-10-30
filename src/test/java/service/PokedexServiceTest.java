@@ -89,6 +89,11 @@ public class PokedexServiceTest {
     }
 
     @Test
+    public void givenNullGetPokemonInfoServiceRequest_whenGetPokemonInfo_thenThrowPokedexGenericException(){
+        Assertions.assertThrows(PokedexGenericException.class, () -> pokedexService.getPokemonInfo(null));
+    }
+
+    @Test
     public void givenGetPokemonInfoServiceRequestWithEmptyString_whenGetPokemonInfo_thenThrowPokedexGenericException(){
         GetPokemonInfoServiceRequest request = new GetPokemonInfoServiceRequest();
         request.setPokemonName(StringUtils.EMPTY);
@@ -118,6 +123,19 @@ public class PokedexServiceTest {
 
         Assertions.assertNotNull(response);
         Assertions.assertEquals(pokemonInformationWithoutDescription, response.getPokemonInformation());
+    }
+
+    @Test
+    public void givenNullGetTranslatedPokemonInformationServiceRequest_whenGetTranslatedPokemonInformation_thenThrowPokedexGenericException() {
+        Assertions.assertThrows(PokedexGenericException.class, () -> pokedexService.getTranslatedPokemonInformation(null));
+    }
+
+    @Test
+    public void givenNullPokemonInformation_whenGetTranslatedPokemonInformation_thenThrowPokedexGenericException() {
+        GetTranslatedPokemonInformationServiceRequest request = new GetTranslatedPokemonInformationServiceRequest();
+        request.setPokemonInformation(null);
+
+        Assertions.assertThrows(PokedexGenericException.class, () -> pokedexService.getTranslatedPokemonInformation(request));
     }
 
     @Test

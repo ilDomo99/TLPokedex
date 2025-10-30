@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
@@ -38,6 +39,18 @@ public class FunTranslationClientTest {
 
         assertTrue(result.isPresent());
         assertEquals(response, result.get());
+    }
+
+    @Test
+    public void givenRestClientException_whenGetYodaTranslation_thenReturnOptional() {
+        TranslateClientRequest request = new TranslateClientRequest();
+
+        when(restTemplate.postForObject(any(String.class), any(TranslateClientRequest.class), any()))
+                .thenThrow(RestClientException.class);
+
+        Optional<TranslateClientResponse> result = funTranslationClient.getYodaTranslation(request);
+
+        assertTrue(result.isEmpty());
     }
 
     @Test
