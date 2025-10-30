@@ -96,4 +96,5 @@ The following endpoints are available:
 - Create a .yml configuration file for each environment containing constants (e.g., API endpoints)
 - Remove unnecessary escape characters
 - Add logging for class entry and exit points
-- Use POST method instead of GET method
+- Use the POST method instead of the GET method
+- Implementing a Cache system
