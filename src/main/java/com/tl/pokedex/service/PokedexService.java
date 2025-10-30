@@ -82,13 +82,14 @@ public class PokedexService {
      *                                  is invalid
      */
     public GetTranslatedPokemonInformationServiceResponse getTranslatedPokemonInformation(GetTranslatedPokemonInformationServiceRequest request){
-        PokemonInformation pokemonInformation = request.getPokemonInformation();
-        validationUtil.isValidOrFail(PokemonInformation.class, pokemonInformation);
+        validationUtil.isValidOrFail(GetTranslatedPokemonInformationServiceRequest.class, request);
 
+        PokemonInformation pokemonInformation = request.getPokemonInformation();
         String originalDescription = pokemonInformation.getDescription();
 
         boolean isDescriptionNotValid = StringUtils.isBlank(originalDescription);
 
+        //If the description is not valid, skip the API call and return the original object
         if(isDescriptionNotValid){
             GetTranslatedPokemonInformationServiceResponse response = new GetTranslatedPokemonInformationServiceResponse();
             response.setPokemonInformation(pokemonInformation);
