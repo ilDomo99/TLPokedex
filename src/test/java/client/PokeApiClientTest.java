@@ -4,6 +4,7 @@ import com.tl.pokedex.client.PokeApiClient;
 import com.tl.pokedex.constant.PokeApiConstant;
 import com.tl.pokedex.dto.api.pokeapi.PokemonSpecies;
 import com.tl.pokedex.dto.api.pokeapi.request.PokemonSpeciesClientRequest;
+import com.tl.pokedex.dto.api.pokeapi.response.PokemonSpeciesClientResponse;
 import config.TestConfig;
 import constant.PokemonNameConstantTest;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ public class PokeApiClientTest {
                         PokemonNameConstantTest.PIKACHU_NORMAL_POKEMON_NAME))
                 .thenReturn(mockedPokemonSpecies);
 
-        var response = pokeApiClient.getPokemonSpecies(request);
+        PokemonSpeciesClientResponse response = pokeApiClient.getPokemonSpecies(request);
 
         assertNotNull(response);
         assertNotNull(response.getPokemonSpecies());
