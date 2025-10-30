@@ -5,7 +5,7 @@ import com.tl.pokedex.constant.PokeApiConstant;
 import com.tl.pokedex.dto.api.pokeapi.PokemonSpecies;
 import com.tl.pokedex.dto.api.pokeapi.request.PokemonSpeciesClientRequest;
 import config.TestConfig;
-import constant.PokemonNameConstant;
+import constant.PokemonNameConstantTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +27,14 @@ public class PokeApiClientTest {
     @Test
     public void testGetPokemonSpecies() {
         PokemonSpeciesClientRequest request = new PokemonSpeciesClientRequest();
-        request.setPokemonName(PokemonNameConstant.NORMAL_POKEMON_NAME);
+        request.setPokemonName(PokemonNameConstantTest.PIKACHU_NORMAL_POKEMON_NAME);
 
         PokemonSpecies mockedPokemonSpecies = new PokemonSpecies();
 
         Mockito.when(restTemplate.getForObject(
                         PokeApiConstant.POKEMON_SPECIES_ENDPOINT,
                         PokemonSpecies.class,
-                        PokemonNameConstant.NORMAL_POKEMON_NAME))
+                        PokemonNameConstantTest.PIKACHU_NORMAL_POKEMON_NAME))
                 .thenReturn(mockedPokemonSpecies);
 
         var response = pokeApiClient.getPokemonSpecies(request);

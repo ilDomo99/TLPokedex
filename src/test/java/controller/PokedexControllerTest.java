@@ -6,7 +6,9 @@ import com.tl.pokedex.dto.controller.response.GetPokemonInfoFromNameControllerRe
 import com.tl.pokedex.dto.controller.response.GetTranslatedPokemonInfoFromNameControllerResponse;
 import com.tl.pokedex.dto.model.PokemonInformation;
 import config.TestConfig;
-import constant.PokemonNameConstant;
+import constant.DescriptionConstantTest;
+import constant.HabitatConstantTest;
+import constant.PokemonNameConstantTest;
 import jakarta.validation.Validator;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
@@ -50,13 +52,21 @@ public class PokedexControllerTest {
 
         String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_POKEMON_INFORMATION_ENDPOINT;
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstant.LEGENDARY_POKEMON_NAME))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstantTest.MEWTWO_LEGENDARY_POKEMON_NAME))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 
         String jsonResponse = mvcResult.getResponse().getContentAsString();
 
-        Assertions.assertDoesNotThrow(() -> objectMapper.readValue(jsonResponse, GetPokemonInfoFromNameControllerResponse.class));
+        GetPokemonInfoFromNameControllerResponse expectedResponse = new GetPokemonInfoFromNameControllerResponse();
+        expectedResponse.setName(PokemonNameConstantTest.MEWTWO_LEGENDARY_POKEMON_NAME);
+        expectedResponse.setDescription(DescriptionConstantTest.MEWTWO_DESCRIPTION);
+        expectedResponse.setHabitat(HabitatConstantTest.RARE_HABITAT);
+        expectedResponse.setIsLegendary(true);
+
+        GetPokemonInfoFromNameControllerResponse response = objectMapper.readValue(jsonResponse, GetPokemonInfoFromNameControllerResponse.class);
+
+        org.assertj.core.api.Assertions.assertThat(response).usingRecursiveComparison().isEqualTo(expectedResponse);
     }
 
     @Test
@@ -65,7 +75,7 @@ public class PokedexControllerTest {
 
         String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_POKEMON_INFORMATION_ENDPOINT;
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstant.STRING_WITH_MORE_THEN_30_CHARS))
+        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstantTest.STRING_WITH_MORE_THEN_30_CHARS))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andReturn();
     }
@@ -87,31 +97,72 @@ public class PokedexControllerTest {
 
         String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_POKEMON_INFORMATION_ENDPOINT;
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstant.NON_POKEMON_NAME))
+        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstantTest.NON_POKEMON_NAME))
                 .andExpect(MockMvcResultMatchers.status().isInternalServerError())
                 .andReturn();
     }
 
     @Test
     @SneakyThrows
-    public void givenLegendaryPokemonName_whenGetTranslatedPokemonInfoFromName_thenReturnDescriptionWithYodaTranslation() {
+    public void givenLegendaryPokemonName_whenGetTranslatedPokemonInfoFromName_thenReturnDescriptionWithYodaTranslationOrOriginalDescription() {
 
         String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_TRANSLATED_POKEMON_INFORMATION_ENDPOINT;
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstant.LEGENDARY_POKEMON_NAME))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstantTest.MEWTWO_LEGENDARY_POKEMON_NAME))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
+
+        String jsonResponse = mvcResult.getResponse().getContentAsString();
+
+        GetTranslatedPokemonInfoFromNameControllerResponse response = objectMapper.readValue(jsonResponse, GetTranslatedPokemonInfoFromNameControllerResponse.class);
+        String description = response.getDescription();
+
+        boolean isValid = DescriptionConstantTest.MEWTWO_DESCRIPTION.equalsIgnoreCase(description) ||
+                DescriptionConstantTest.MEWTWO_YODA_TRANSLATION_DESCRIPTION.equalsIgnoreCase(description);
+
+        Assertions.assertTrue(isValid);
     }
 
     @Test
     @SneakyThrows
-    public void givenNormalPokemonName_whenGetTranslatedPokemonInfoFromName_thenReturnDescriptionWithShakespeareTranslation() {
+    public void givenCaveHabitatPokemon_whenGetTranslatedPokemonInfoFromName_thenReturnDescriptionWithYodaTranslationOrOriginalDescription() {
 
         String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_TRANSLATED_POKEMON_INFORMATION_ENDPOINT;
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstant.NORMAL_POKEMON_NAME))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstantTest.ZUBAT_CAVE_HABITAT_POKEMON_NAME))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
+
+        String jsonResponse = mvcResult.getResponse().getContentAsString();
+
+        GetTranslatedPokemonInfoFromNameControllerResponse response = objectMapper.readValue(jsonResponse, GetTranslatedPokemonInfoFromNameControllerResponse.class);
+        String description = response.getDescription();
+
+        boolean isValid = DescriptionConstantTest.ZUBAT_DESCRIPTION.equalsIgnoreCase(description) ||
+                DescriptionConstantTest.ZUBAT_YODA_TRANSLATION_DESCRIPTION.equalsIgnoreCase(description);
+
+        Assertions.assertTrue(isValid);
+    }
+
+    @Test
+    @SneakyThrows
+    public void givenNormalPokemonName_whenGetTranslatedPokemonInfoFromName_thenReturnDescriptionWithShakespeareTranslationOrOriginalDescription() {
+
+        String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_TRANSLATED_POKEMON_INFORMATION_ENDPOINT;
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstantTest.PIKACHU_NORMAL_POKEMON_NAME))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        String jsonResponse = mvcResult.getResponse().getContentAsString();
+
+        GetTranslatedPokemonInfoFromNameControllerResponse response = objectMapper.readValue(jsonResponse, GetTranslatedPokemonInfoFromNameControllerResponse.class);
+        String description = response.getDescription();
+
+        boolean isValid = DescriptionConstantTest.PIKACHU_DESCRIPTION.equalsIgnoreCase(description) ||
+                DescriptionConstantTest.PIKACHU_SHAKESPEARE_TRANSLATION_DESCRIPTION.equalsIgnoreCase(description);
+
+        Assertions.assertTrue(isValid);
     }
 
     @Test
@@ -120,7 +171,7 @@ public class PokedexControllerTest {
 
         String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_TRANSLATED_POKEMON_INFORMATION_ENDPOINT;
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstant.STRING_WITH_MORE_THEN_30_CHARS))
+        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstantTest.STRING_WITH_MORE_THEN_30_CHARS))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andReturn();
     }
@@ -142,14 +193,14 @@ public class PokedexControllerTest {
 
         String URI = AppConstant.BASE_ENDPOINT + AppConstant.GET_TRANSLATED_POKEMON_INFORMATION_ENDPOINT;
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstant.NON_POKEMON_NAME))
+        mockMvc.perform(MockMvcRequestBuilders.get(URI, PokemonNameConstantTest.NON_POKEMON_NAME))
                 .andExpect(MockMvcResultMatchers.status().isInternalServerError())
                 .andReturn();
     }
 
     @Test
     void givenPokemonInformation_whenCopyProperties_thenGetPokemonInfoFromNameControllerResponseHasAllFieldsCopied() {
-        PokemonInformation source = new PokemonInformation(PokemonNameConstant.LEGENDARY_POKEMON_NAME, "test", "test", true);
+        PokemonInformation source = new PokemonInformation(PokemonNameConstantTest.MEWTWO_LEGENDARY_POKEMON_NAME, "test", "test", true);
         GetPokemonInfoFromNameControllerResponse target = new GetPokemonInfoFromNameControllerResponse();
 
         BeanUtils.copyProperties(source, target);
@@ -159,7 +210,7 @@ public class PokedexControllerTest {
 
     @Test
     void givenPokemonInformation_whenCopyProperties_thenGetTranslatedPokemonInfoFromNameControllerResponseHasAllFieldsCopied() {
-        PokemonInformation source = new PokemonInformation(PokemonNameConstant.LEGENDARY_POKEMON_NAME, "test", "test", true);
+        PokemonInformation source = new PokemonInformation(PokemonNameConstantTest.MEWTWO_LEGENDARY_POKEMON_NAME, "test", "test", true);
         GetTranslatedPokemonInfoFromNameControllerResponse target = new GetTranslatedPokemonInfoFromNameControllerResponse();
 
         BeanUtils.copyProperties(source, target);

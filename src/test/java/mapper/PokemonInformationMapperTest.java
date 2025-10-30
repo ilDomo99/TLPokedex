@@ -7,7 +7,7 @@ import com.tl.pokedex.dto.api.pokeapi.PokemonSpecies;
 import com.tl.pokedex.dto.model.PokemonInformation;
 import com.tl.pokedex.mapper.PokemonInformationMapper;
 import config.TestConfig;
-import constant.PokemonNameConstant;
+import constant.PokemonNameConstantTest;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class PokemonInformationMapperTest {
         final String description = "test";
 
         PokemonSpecies pokemonSpecies = new PokemonSpecies();
-        pokemonSpecies.setName(PokemonNameConstant.NORMAL_POKEMON_NAME);
+        pokemonSpecies.setName(PokemonNameConstantTest.PIKACHU_NORMAL_POKEMON_NAME);
         pokemonSpecies.setIsLegendary(false);
 
         NamedApiResource habitat = new NamedApiResource();
@@ -40,7 +40,7 @@ public class PokemonInformationMapperTest {
 
         PokemonInformation pokemonInformation = pokemonInformationMapper.pokemonInformationFromPokemonSpecies(pokemonSpecies);
 
-        PokemonInformation expectedResult = new PokemonInformation(PokemonNameConstant.NORMAL_POKEMON_NAME, description, PokeApiConstant.CAVE_HABITAT, false);
+        PokemonInformation expectedResult = new PokemonInformation(PokemonNameConstantTest.PIKACHU_NORMAL_POKEMON_NAME, description, PokeApiConstant.CAVE_HABITAT, false);
 
         org.assertj.core.api.Assertions.assertThat(pokemonInformation).usingRecursiveComparison().isEqualTo(expectedResult);
     }
@@ -48,11 +48,11 @@ public class PokemonInformationMapperTest {
     @Test
     public void givenPokemonSpeciesWithNullValue_whenPokemonInformationFromPokemonSpecies_thenReturnPokemonInformationWithEmptyValues() {
         PokemonSpecies pokemonSpecies = new PokemonSpecies();
-        pokemonSpecies.setName(PokemonNameConstant.LEGENDARY_POKEMON_NAME);
+        pokemonSpecies.setName(PokemonNameConstantTest.MEWTWO_LEGENDARY_POKEMON_NAME);
 
         PokemonInformation pokemonInformation = pokemonInformationMapper.pokemonInformationFromPokemonSpecies(pokemonSpecies);
 
-        PokemonInformation expectedResult = new PokemonInformation(PokemonNameConstant.LEGENDARY_POKEMON_NAME, StringUtils.EMPTY, StringUtils.EMPTY, null);
+        PokemonInformation expectedResult = new PokemonInformation(PokemonNameConstantTest.MEWTWO_LEGENDARY_POKEMON_NAME, StringUtils.EMPTY, StringUtils.EMPTY, null);
 
         org.assertj.core.api.Assertions.assertThat(pokemonInformation).usingRecursiveComparison().isEqualTo(expectedResult);
     }
@@ -60,7 +60,7 @@ public class PokemonInformationMapperTest {
     @Test
     public void givenPokemonSpeciesWithNullDescription_whenPokemonInformationFromPokemonSpecies_thenReturnPokemonInformationWithoutDescription() {
         PokemonSpecies pokemonSpecies = new PokemonSpecies();
-        pokemonSpecies.setName(PokemonNameConstant.NORMAL_POKEMON_NAME);
+        pokemonSpecies.setName(PokemonNameConstantTest.PIKACHU_NORMAL_POKEMON_NAME);
         pokemonSpecies.setIsLegendary(false);
 
         NamedApiResource habitat = new NamedApiResource();
@@ -73,7 +73,7 @@ public class PokemonInformationMapperTest {
 
         PokemonInformation pokemonInformation = pokemonInformationMapper.pokemonInformationFromPokemonSpecies(pokemonSpecies);
 
-        PokemonInformation expectedResult = new PokemonInformation(PokemonNameConstant.NORMAL_POKEMON_NAME, StringUtils.EMPTY, PokeApiConstant.CAVE_HABITAT, false);
+        PokemonInformation expectedResult = new PokemonInformation(PokemonNameConstantTest.PIKACHU_NORMAL_POKEMON_NAME, StringUtils.EMPTY, PokeApiConstant.CAVE_HABITAT, false);
 
         org.assertj.core.api.Assertions.assertThat(pokemonInformation).usingRecursiveComparison().isEqualTo(expectedResult);
     }
@@ -81,7 +81,7 @@ public class PokemonInformationMapperTest {
     @Test
     public void givenPokemonSpeciesWithNullFlavorText_whenPokemonInformationFromPokemonSpecies_thenReturnPokemonInformationWithoutDescription() {
         PokemonSpecies pokemonSpecies = new PokemonSpecies();
-        pokemonSpecies.setName(PokemonNameConstant.NORMAL_POKEMON_NAME);
+        pokemonSpecies.setName(PokemonNameConstantTest.PIKACHU_NORMAL_POKEMON_NAME);
         pokemonSpecies.setIsLegendary(false);
 
         NamedApiResource habitat = new NamedApiResource();
@@ -96,7 +96,7 @@ public class PokemonInformationMapperTest {
 
         PokemonInformation pokemonInformation = pokemonInformationMapper.pokemonInformationFromPokemonSpecies(pokemonSpecies);
 
-        PokemonInformation expectedResult = new PokemonInformation(PokemonNameConstant.NORMAL_POKEMON_NAME, StringUtils.EMPTY, PokeApiConstant.CAVE_HABITAT, false);
+        PokemonInformation expectedResult = new PokemonInformation(PokemonNameConstantTest.PIKACHU_NORMAL_POKEMON_NAME, StringUtils.EMPTY, PokeApiConstant.CAVE_HABITAT, false);
 
         org.assertj.core.api.Assertions.assertThat(pokemonInformation).usingRecursiveComparison().isEqualTo(expectedResult);
     }
@@ -104,7 +104,7 @@ public class PokemonInformationMapperTest {
     @Test
     public void givenPokemonSpeciesWithNullLanguage_whenPokemonInformationFromPokemonSpecies_thenReturnPokemonInformationWithoutDescription() {
         PokemonSpecies pokemonSpecies = new PokemonSpecies();
-        pokemonSpecies.setName(PokemonNameConstant.NORMAL_POKEMON_NAME);
+        pokemonSpecies.setName(PokemonNameConstantTest.PIKACHU_NORMAL_POKEMON_NAME);
         pokemonSpecies.setIsLegendary(false);
 
         NamedApiResource habitat = new NamedApiResource();
@@ -120,7 +120,7 @@ public class PokemonInformationMapperTest {
 
         PokemonInformation pokemonInformation = pokemonInformationMapper.pokemonInformationFromPokemonSpecies(pokemonSpecies);
 
-        PokemonInformation expectedResult = new PokemonInformation(PokemonNameConstant.NORMAL_POKEMON_NAME, StringUtils.EMPTY, PokeApiConstant.CAVE_HABITAT, false);
+        PokemonInformation expectedResult = new PokemonInformation(PokemonNameConstantTest.PIKACHU_NORMAL_POKEMON_NAME, StringUtils.EMPTY, PokeApiConstant.CAVE_HABITAT, false);
 
         org.assertj.core.api.Assertions.assertThat(pokemonInformation).usingRecursiveComparison().isEqualTo(expectedResult);
     }
