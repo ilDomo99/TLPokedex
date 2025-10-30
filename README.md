@@ -91,5 +91,9 @@ The following endpoints are available:
 - **Path Parameters**:
     - `pokemonName`: Name of the Pokemon (case-insensitive)
 
-
-
+    
+### Improvements for Production
+- Create a .yml configuration file for each environment containing constants (e.g., API endpoints)
+- Remove unnecessary escape characters
+- Add logging for class entry and exit points
+- Use POST method instead of GET method
