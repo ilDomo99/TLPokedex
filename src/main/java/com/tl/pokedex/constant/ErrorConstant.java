@@ -11,5 +11,6 @@ public class ErrorConstant {
 
     public static final String OBJECT_CANNOT_BE_NULL_MESSAGE = "object cannot be null";
 
+    public static final String VIOLATION_PROPERTY_TEMPLATE = "[%s]: [%s]";
     public static final String VALIDATION_ERROR_MESSAGE = "Error during validation of [%s] caused by: [%s]";
 }

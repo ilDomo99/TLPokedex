@@ -33,7 +33,7 @@ public class ValidationUtil {
                         String message = violation.getMessage();
                         Path property = violation.getPropertyPath();
 
-                        return String.format("[%s]: [%s]", property, message);
+                        return String.format(ErrorConstant.VIOLATION_PROPERTY_TEMPLATE, property, message);
                     })
                     .collect(Collectors.joining(", "));
 
