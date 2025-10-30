@@ -53,6 +53,9 @@ public class PokemonInformationMapper {
 
         String description = descriptionFromFlavorText.orElse(StringUtils.EMPTY);
 
+        //the PokeAPI returns descriptions with escape characters, this utility can remove them
+        //StringUtil.removeEscapeCharacters(description);
+
         String habitat = pokemonSpecies.getHabitat() != null ?
                 pokemonSpecies.getHabitat().getName() :
                 StringUtils.EMPTY;
