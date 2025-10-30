@@ -36,6 +36,17 @@ public class PokedexService {
         this.validationUtil = validationUtil;
     }
 
+
+    /**
+     * Retrieves detailed information about a specific Pokemon based on its name.
+     * This method validates the input request, interacts with external APIs to
+     * fetch Pokemon species details, maps the retrieved data into a structured
+     * format, and returns the result.
+     *
+     * @param request the request object containing the name of the Pokemon to fetch information for
+     * @return a {@link GetPokemonInfoServiceResponse GetPokemonInfoServiceResponse} object encapsulating the retrieved Pokemon information
+     * @throws com.tl.pokedex.exception.PokedexGenericException if the request or response validation fails
+     */
     public GetPokemonInfoServiceResponse getPokemonInfo(GetPokemonInfoServiceRequest request){
         validationUtil.isValidOrFail(GetPokemonInfoServiceRequest.class, request);
 
@@ -57,6 +68,19 @@ public class PokedexService {
         return response;
     }
 
+    /**
+     * Retrieves translated Pokemon information, including a description that is modified based on
+     * the Pokemon's characteristics such as being legendary or its habitat.
+     * The method validates the input request, translates the Pokemon's description using external
+     * translation APIs, and returns the updated Pokemon information with the translated description.
+     *
+     * @param request the input request object containing the original Pokemon information that needs
+     *                translation
+     * @return a {@link GetTranslatedPokemonInformationServiceResponse} object containing the updated
+     *         Pokemon information with the translated description
+     * @throws com.tl.pokedex.exception.PokedexGenericException if the input request or Pokemon information within the request
+     *                                  is invalid
+     */
     public GetTranslatedPokemonInformationServiceResponse getTranslatedPokemonInformation(GetTranslatedPokemonInformationServiceRequest request){
         PokemonInformation pokemonInformation = request.getPokemonInformation();
         validationUtil.isValidOrFail(PokemonInformation.class, pokemonInformation);
@@ -96,6 +120,12 @@ public class PokedexService {
         return response;
     }
 
+
+    /**
+     * @param translateClientResponse the response object containing translation details
+     * @param originalDescription the original description of the Pokemon
+     * @return the translated description if available; otherwise, the original description
+     */
     private String getTranslatedDescriptionOrOriginalDescription(TranslateClientResponse translateClientResponse, String originalDescription){
         Contents contents = translateClientResponse.getContents();
 

@@ -22,6 +22,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    /**
+     * Handles generic runtime exceptions and returns a standardized {@link ErrorMessage} response.
+     *
+     * @param ex the exception that was thrown
+     * @param request the HTTP request during which the exception occurred
+     * @return a ResponseEntity containing an {@link ErrorMessage} with details about the error
+     */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorMessage> handleGenericException(Exception ex, HttpServletRequest request) {
         String uri = request.getRequestURI();
@@ -47,6 +54,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.internalServerError().body(errorMessage);
     }
 
+    /**
+     * Handles {@link ConstraintViolationException} by mapping the validation errors and constructing
+     * a standardized {@link ErrorMessage} response.
+     *
+     * @param ex the {@link ConstraintViolationException} instance containing details about validation errors
+     * @param request the {@link HttpServletRequest} during which the validation error occurred, used for extracting request URI
+     * @return a {@link ResponseEntity} containing an {@link ErrorMessage} that describes the validation errors and their context
+     */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorMessage> handleConstraintViolationException(ConstraintViolationException ex, HttpServletRequest request) {
 

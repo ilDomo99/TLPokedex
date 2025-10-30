@@ -15,6 +15,17 @@ import java.util.Optional;
 @Component
 public class PokemonInformationMapper {
 
+    /**
+     * Maps a {@link PokemonSpecies} object to a {@link PokemonInformation} object, extracting relevant
+     * information such as name, description, habitat, and legendary status.
+     * This method processes the data retrieved from a Pokemon API, filters for English language
+     * descriptions, and provides a structured representation of the Pokemon's information.
+     *
+     * @param pokemonSpecies the {@link PokemonSpecies} object containing detailed data of a Pokemon,
+     *                       including its name, description, habitat, and legendary status
+     * @return a {@link PokemonInformation} object containing the name, English description, habitat,
+     *         and legendary status of the Pokemon
+     */
     public PokemonInformation pokemonInformationFromPokemonSpecies(PokemonSpecies pokemonSpecies) {
         String name = pokemonSpecies.getName();
 
